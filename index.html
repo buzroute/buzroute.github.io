@@ -34,7 +34,7 @@ function busMinutes(when)
 
   var bus = Math.floor(when) * 60 + (when - Math.floor(when)) * 100;
 
-  var now = time.getHours() * 60 + time.getMinutes() - 200;
+  var now = time.getHours() * 60 + time.getMinutes();
 
   var wait = Math.floor(bus - now);
 
