@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<p id="demo"></p>
+
+<canvas id="drawCanvas">
+</canvas>
+
+</body>
+<script>
+
+function formatTime(when, info, pos)
+{
+  var output = "";
+
+  var data = "" + when + " (" + info.t + ", " + info.info1 + ", " + info.info2 + ")";
+
+  if (pos == 0)
+  {
+    output += "<b>" + data + "</b><br>";
+  }
+  else
+  {
+    output += data + "<br>";
+  }
+
+  return output;
+}
+
+function busMinutes(when)
+{
+  var time = new Date();
+
+  var bus = Math.floor(when) * 60 + (when - Math.floor(when)) * 100;
+
+  var now = time.getHours() * 60 + time.getMinutes() - 200;
+
+  var wait = Math.floor(bus - now);
+
+  if (wait >= 0)
+  {
+    if (wait < 3)
+    {
+      wait = "Due";
+    }
+    else
+    {
+      wait += " mins";
+    }
+  }
+
+  return wait;
+}
+
+function timerFunc()
+{
+  var weekdayTimes = [
+    {x: 134, y: 605, t:6.07, info1:"21", info2:"DIA"},
+    {x: 132, y: 624, t:6.49, info1:"31", info2:"FMR"},
+    {x: 132, y: 639, t:7.28, info1:"31", info2:"FMR"},
+    {x: 131, y: 658, t:8.08, info1:"31", info2:"FMR"},
+    {x: 136, y: 674, t:8.51, info1:"31", info2:"FMR"},
+    {x: 133, y: 691, t:8.57, info1:"21", info2:"DIA"},
+    {x: 136, y: 706, t:9.21, info1:"31A", info2:"FMR"},
+    {x: 303, y: 605, t:9.51, info1:"31A", info2:"FMR"},
+    {x: 301, y: 622, t:10.21, info1:"31A", info2:"FMR"},
+    {x: 305, y: 639, t:10.51, info1:"31A", info2:"FMR"},
+    {x: 302, y: 654, t:11.19, info1:"21", info2:"DIA"},
+    {x: 306, y: 669, t:11.21, info1:"31A", info2:"FMR"},
+    {x: 305, y: 670, t:11.51, info1:"31A", info2:"FMR"},
+    {x: 304, y: 702, t:12.22, info1:"31A", info2:"FMR"},
+    {x: 468, y: 606, t:12.51, info1:"31A", info2:"FMR"},
+    {x: 470, y: 622, t: 13.04, info1:"21", info2:"DIA"},
+    {x: 468, y: 639, t: 13.21, info1:"31A", info2:"FMR"},
+    {x: 468, y: 654, t: 13.52, info1:"31A", info2:"FMR"},
+    {x: 467, y: 672, t: 14.21, info1:"31A", info2:"FMR"},
+    {x: 470, y: 685, t: 14.50, info1:"31", info2:"FMR"},
+    {x: 469, y: 702, t: 15.20, info1:"31", info2:"FMR"},
+    {x: 634, y: 609, t: 15.51, info1:"31", info2:"FMR"},
+    {x: 632, y: 624, t: 15.51, info1:"31", info2:"FMR"},
+    {x: 631, y: 626, t: 16.21, info1:"31", info2:"FMR"},
+    {x: 629, y: 642, t: 16.24, info1:"21", info2:"DIA"},
+    {x: 632, y: 658, t: 16.50, info1:"31", info2:"FMR"},
+    {x: 628, y: 674, t: 17.19, info1:"31", info2:"FMR"},
+    {x: 628, y: 689, t: 17.49, info1:"31", info2:"FMR"},
+    {x: 628, y: 705, t: 18.48, info1:"31", info2:"FMR"},
+  ];
+
+  var weekendTimes = [
+    {x: 143, y: 788, t: 8.45, info1:"21", info2:"DIA"},
+    {x: 144, y: 802, t: 8.46, info1:"31", info2:"FMR"},
+    {x: 145, y: 818, t: 9.44, info1:"31", info2:"FMR"},
+    {x: 148, y: 832, t: 10.44, info1:"31", info2:"FMR"},
+    {x: 308, y: 782, t: 11.20, info1:"21", info2:"DIA"},
+    {x: 310, y: 796, t: 11.45, info1:"31", info2:"FMR"},
+    {x: 311, y: 813, t: 12.44, info1:"31", info2:"FMR"},
+    {x: 311, y: 827, t: 13.35, info1:"21", info2:"DIA"},
+    {x: 469, y: 781, t: 13.44, info1:"31", info2:"FMR"},
+    {x: 467, y: 797, t: 14.45, info1:"31", info2:"FMR"},
+    {x: 466, y: 811, t: 15.46, info1:"31", info2:"FMR"},
+    {x: 465, y: 827, t: 15.50, info1:"21", info2:"DIA"},
+    {x: 624, y: 783, t: 16.45, info1:"31", info2:"FMR"},
+    {x: 622, y: 798, t: 17.44, info1:"31", info2:"FMR"},
+    {x: 620, y: 813, t: 18.05, info1:"21", info2:"DIA"},
+    {x: 620, y: 828, t: 18.43, info1:"31", info2:"FMR"},
+  ];
+
+  var day = (new Date).getDay();
+
+  var times = [];
+
+  if ((day == 0) || (day == 6))
+  {
+    times = weekendTimes;
+  }
+  else
+  {
+    times = weekdayTimes;
+  }
+
+  var output = "";
+
+  var busCount = 0;
+
+  var canvas = document.getElementById("drawCanvas");
+  var ctx = canvas.getContext("2d");
+  ctx.drawImage(timesImage, 0, 0);
+
+  for (var i = 0; i < times.length; i++)
+  {
+    var time = times[i];
+
+    var wait = busMinutes(time.t);
+
+    if (wait < 0)
+    {
+      continue;
+    }
+
+    output += formatTime(wait, time, busCount);
+
+    ctx.fillStyle = "blue";
+    ctx.fillRect(time.x, time.y, 5, 5);
+
+    busCount++;
+
+    if (busCount == 3)
+    {
+      break;
+    }
+  }
+
+  if (busCount == 0)
+  {
+    output += "(None)";
+  }
+
+  document.getElementById('demo').innerHTML = output;
+}
+
+function getCursorPosition(canvas, event)
+{
+  const rect = canvas.getBoundingClientRect()
+  const x = event.clientX - rect.left
+  const y = event.clientY - rect.top
+  console.clear();
+  console.log("x: " + Math.floor(x) + ", y: " + Math.floor(y))
+}
+
+function imageLoaded()
+{
+  var canvas = document.getElementById("drawCanvas");
+  canvas.width = timesImage.width;
+  canvas.height = timesImage.height;
+
+  canvas.addEventListener('mousedown', function(e) {
+      getCursorPosition(canvas, e)
+  });
+
+  setInterval(timerFunc, 1);
+}
+
+var timesImage = new Image;
+timesImage.addEventListener("load", function () {
+  imageLoaded();
+});
+timesImage.src = "times.jpg";
+
+</script>
+</html> 
