@@ -4,7 +4,20 @@
   <title>buzroute</title>
   <style>
   body {
-  background-color: #ffffff;
+    background-color: #000000;
+  }
+  p {
+    color: #ffffff;
+    font-size: 600%;
+  }
+  .pleft {
+    float: left;
+  }
+  .pmid {
+    float: none;
+  }
+  .pright {
+    float: right;
   }
   </style>
 </head>
@@ -21,16 +34,13 @@ function formatTime(when, info, pos)
 {
   var output = "";
 
-  var data = "" + when + " (" + info.t + ", " + info.info1 + ", " + info.info2 + ")";
+  var data = "";
 
-  if (pos == 0)
-  {
-    output += "<b>" + data + "</b><br>";
-  }
-  else
-  {
-    output += data + "<br>";
-  }
+  data += "<span class=\"pleft\">" + info.info1 + " (" + info.info2 + ")" + "</span>";
+  data += "<span class=\"pright\">" + when + "</span>";
+  data += "<br>";
+
+  output += data;
 
   return output;
 }
